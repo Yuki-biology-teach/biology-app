@@ -1,0 +1,57 @@
+body {
+  font-family: sans-serif;
+  margin: 20px;
+  line-height: 1.5;
+}
+
+h1 {
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+label select, button {
+  font-size: 1rem;
+  padding: 5px;
+}
+
+#question {
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+#options button {
+  display: block;
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+#options button.correct {
+  background-color: #8fce00;
+  color: #fff;
+}
+
+#options button.wrong {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  label select, button {
+    font-size: 1.2rem;
+  }
+  #options button {
+    font-size: 1.2rem;
+  }
+}
