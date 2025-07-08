@@ -1,112 +1,79 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>生物基礎クイズ</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 640px;
-    margin: auto;
-    padding: 10px;
-    background: #f9f9f9;
-  }
-  h1 {
-    text-align: center;
-  }
-  select, button {
-    font-size: 1rem;
-    margin: 10px 5px 20px 0;
-    padding: 5px 8px;
-  }
-  .question-box {
-    background: #fff;
-    padding: 15px 20px;
-    border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-    margin-bottom: 15px;
-  }
-  .question-text {
-    font-weight: bold;
-    margin-bottom: 12px;
-  }
-  .options {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  .options li {
-    background: #eee;
-    margin-bottom: 8px;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.3s;
-  }
-  .options li:hover {
-    background-color: #d0f0ff;
-  }
-  .selected {
-    outline: 2px solid #005fcc;
-  }
-  .correct {
-    background-color: #c8f7c5 !important; /* 緑 */
-    color: #1a5d00;
-    cursor: default;
-  }
-  .incorrect {
-    background-color: #f7c5c5 !important; /* 赤 */
-    color: #7a0000;
-    cursor: default;
-  }
-  #result {
-    font-weight: bold;
-    margin-top: 20px;
-    text-align: center;
-  }
-  #missedQuestions {
-    margin-top: 20px;
-    background: #fff;
-    padding: 15px 20px;
-    border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-  }
-  #missedQuestions h2 {
-    margin-top: 0;
-  }
-  .missed-question {
-    margin-bottom: 15px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生物クイズアプリ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    select, button, label {
+      font-size: 1rem;
+      margin: 5px;
+    }
+    #options button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    #historyList ul {
+      list-style: none;
+      padding: 0;
+    }
+    #historyList li {
+      margin: 5px 0;
+    }
+    @media (max-width: 600px) {
+      select, button, label {
+        font-size: 1.2rem;
+      }
+      #options button {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <h1>生物クイズアプリ</h1>
 
-<h1>生物基礎クイズ</h1>
+  <!-- 科目と単元 -->
+  <label for="subjectSelect">科目:</label>
+  <select id="subjectSelect">
+    <option value="">選択してください</option>
+  </select>
 
-<label for="subjectSelect">科目を選択してください：</label>
-<select id="subjectSelect">
-  <option value="">--選択してください--</option>
-</select>
+  <label for="unitSelect">単元:</label>
+  <select id="unitSelect">
+    <option value="">選択してください</option>
+  </select>
 
-<label for="unitSelect">分野を選択してください：</label>
-<select id="unitSelect" disabled>
-  <option value="">--先に科目を選択してください--</option>
-</select>
-
-<button id="startBtn" disabled>スタート</button>
-
-<div id="quizContainer" style="display:none;">
-  <div id="questionNumber"></div>
-  <div class="question-box">
-    <div id="questionText" class="question-text"></div>
-    <ul id="optionsList" class="options"></ul>
+  <!-- モード選択 -->
+  <div>
+    <label>出題モード:</label>
+    <label><input type="radio" name="mode" value="10" checked> 10問</label>
+    <label><input type="radio" name="mode" value="all"> 全問</label>
   </div>
-  <button id="nextBtn" disabled>回答を確定する</button>
-</div>
 
-<div id="result"></div>
-<div id="missedQuestions"></div>
+  <button id="startQuiz">クイズ開始</button>
+
+  <!-- クイズ表示 -->
+  <div id="quiz" style="display:none;">
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <button id="nextQuestion" style="display:none;">次の問題</button>
+  </div>
+
+  <!-- 苦手問題 -->
+  <h2>苦手問題</h2>
+  <button id="showHistory">一覧表示</button>
+  <button id="retryWrong">解き直し</button>
+  <div id="historyList"></div>
 
 <script>
   // 問題データ（JSON配列）
@@ -1232,7 +1199,7 @@
     "subject": "生物基礎",
     "field": "ヒトの体内環境の維持",
     "unit": "体内環境の維持のしくみ",
-    "questionText": "酸素を運ぶために赤血球に含まれるたんぱく質は何か？",
+    "questionText": "酸素を運ぶために赤血球に含まれるタンパク質は何か？",
     "option1": "アルブミン",
     "option2": "ヘモグロビン",
     "option3": "ミオグロビン",
@@ -1294,7 +1261,7 @@
     "unit": "体内環境の維持のしくみ",
     "questionText": "生体の内部環境を一定に保つ仕組みを何というか？",
     "option1": "代謝",
-    "option2": "ホメオスタシス",
+    "option2": "恒常性（ホメオスタシス）",
     "option3": "適応",
     "option4": "オートファジー",
     "correctAnswerIndex": "恒常性（ホメオスタシス）"
@@ -1429,7 +1396,7 @@
     "option2": "副腎髄質",
     "option3": "副腎皮質",
     "option4": "下垂体",
-    "correctAnswerIndex": "副神髄質"
+    "correctAnswerIndex": "副腎髄質"
   },
   {
     "id": 111,
@@ -2490,226 +2457,128 @@
     
   ];
 
-  // シャッフル関数（Fisher-Yates）
- function shuffle(array) {
-    for (let i = array.length -1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i+1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
+    let filteredQuestions = [];
+    let currentQuestionIndex = 0;
+    let wrongQuestions = [];
 
-  const subjectSelect = document.getElementById('subjectSelect');
-  const unitSelect = document.getElementById('unitSelect');
-  const startBtn = document.getElementById('startBtn');
-  const quizContainer = document.getElementById('quizContainer');
-  const questionNumber = document.getElementById('questionNumber');
-  const questionText = document.getElementById('questionText');
-  const optionsList = document.getElementById('optionsList');
-  const nextBtn = document.getElementById('nextBtn');
-  const resultDiv = document.getElementById('result');
-  const missedQuestionsDiv = document.getElementById('missedQuestions');
+    // 初期設定: 科目と単元
+    const subjectSelect = document.getElementById('subjectSelect');
+    const unitSelect = document.getElementById('unitSelect');
 
-  let filteredQuestions = [];
-  let currentIndex = 0;
-  let score = 0;
-  let selectedAnswer = null;
-  let answered = false; // 回答済みフラグ
-
-  let missedQuestions = [];
-
-  function getUniqueSubjects() {
-    const subjects = questions.map(q => q.subject);
-    return [...new Set(subjects)];
-  }
-
-  function getUnitsBySubject(subject) {
-    const filtered = questions.filter(q => q.subject === subject);
-    const units = filtered.map(q => q.unit);
-    return [...new Set(units)];
-  }
-
-  function initSubjectOptions() {
-    const subjects = getUniqueSubjects();
-    subjects.forEach(subj => {
-      const option = document.createElement('option');
-      option.value = subj;
-      option.textContent = subj;
-      subjectSelect.appendChild(option);
+    const subjects = [...new Set(questions.map(q => q.subject))];
+    subjects.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      subjectSelect.appendChild(opt);
     });
-  }
 
-  function updateUnitOptions(subject) {
-    unitSelect.innerHTML = '';
-    if (!subject) {
-      unitSelect.disabled = true;
-      const option = document.createElement('option');
-      option.textContent = '--先に科目を選択してください--';
-      option.value = '';
-      unitSelect.appendChild(option);
-      startBtn.disabled = true;
-      return;
-    }
-    const units = getUnitsBySubject(subject);
-    if (units.length === 0) {
-      unitSelect.disabled = true;
-      const option = document.createElement('option');
-      option.textContent = '--該当分野なし--';
-      option.value = '';
-      unitSelect.appendChild(option);
-      startBtn.disabled = true;
-      return;
-    }
-    unitSelect.disabled = false;
-    const defaultOption = document.createElement('option');
-    defaultOption.textContent = '--選択してください--';
-    defaultOption.value = '';
-    unitSelect.appendChild(defaultOption);
-    units.forEach(unit => {
-      const option = document.createElement('option');
-      option.value = unit;
-      option.textContent = unit;
-      unitSelect.appendChild(option);
-    });
-    startBtn.disabled = true;
-  }
-
-  function showQuestion() {
-    answered = false;
-    selectedAnswer = null;
-    nextBtn.disabled = true;
-    nextBtn.textContent = '回答を確定する';
-    questionNumber.textContent = `問題 ${currentIndex + 1} / ${filteredQuestions.length}`;
-    const q = filteredQuestions[currentIndex];
-    questionText.textContent = q.questionText;
-
-    let opts = [q.option1, q.option2, q.option3, q.option4];
-    shuffle(opts);
-
-    optionsList.innerHTML = '';
-    opts.forEach(opt => {
-      const li = document.createElement('li');
-      li.textContent = opt;
-      li.classList.remove('correct', 'incorrect', 'selected');
-      li.style.pointerEvents = 'auto';
-      li.addEventListener('click', () => {
-        if (answered) return; // 回答確定後はクリック無効
-        selectedAnswer = opt;
-        Array.from(optionsList.children).forEach(el => el.classList.remove('selected'));
-        li.classList.add('selected');
-        nextBtn.disabled = false;
+    subjectSelect.addEventListener('change', () => {
+      unitSelect.innerHTML = '<option value="">選択してください</option>';
+      const units = [...new Set(questions.filter(q => q.subject === subjectSelect.value).map(q => q.unit))];
+      units.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u;
+        opt.textContent = u;
+        unitSelect.appendChild(opt);
       });
-      optionsList.appendChild(li);
     });
-  }
 
-  nextBtn.addEventListener('click', () => {
-    if (!answered) {
-      // 回答を確定するフェーズ
-      if (selectedAnswer === null) {
-        alert('回答を選択してください。');
-        return;
-      }
-      answered = true;
+    document.getElementById('startQuiz').addEventListener('click', () => {
+      const selectedSubject = subjectSelect.value;
+      const selectedUnit = unitSelect.value;
+      const mode = document.querySelector('input[name="mode"]:checked').value;
 
-      const q = filteredQuestions[currentIndex];
-      const lis = optionsList.children;
+      filteredQuestions = questions.filter(q =>
+        (!selectedSubject || q.subject === selectedSubject) &&
+        (!selectedUnit || q.unit === selectedUnit)
+      );
 
-      // 選択肢クリック禁止
-      Array.from(lis).forEach(li => li.style.pointerEvents = 'none');
+      shuffleArray(filteredQuestions);
 
-      // 正解選択肢を緑色に
-      Array.from(lis).forEach(li => {
-        if (li.textContent === q.correctAnswerIndex) {
-          li.classList.add('correct');
-        }
-      });
+      if (mode === '10') filteredQuestions = filteredQuestions.slice(0, 10);
 
-      if (selectedAnswer === q.correctAnswerIndex) {
-        score++;
-      } else {
-        missedQuestions.push(q);
-        // 間違い選択肢を赤色に
-        Array.from(lis).forEach(li => {
-          if (li.textContent === selectedAnswer && !li.classList.contains('correct')) {
-            li.classList.add('incorrect');
-          }
-        });
-      }
-      nextBtn.textContent = currentIndex + 1 === filteredQuestions.length ? '結果を見る' : '次の問題へ';
+      currentQuestionIndex = 0;
+      wrongQuestions = [];
+      localStorage.setItem('wrongQuestions', JSON.stringify([]));
 
-    } else {
-      // 次の問題へ進むフェーズ
-      currentIndex++;
-      if (currentIndex >= filteredQuestions.length) {
-        showResult();
-      } else {
+      if (filteredQuestions.length > 0) {
+        document.getElementById('quiz').style.display = 'block';
         showQuestion();
       }
-    }
-  });
+    });
 
-  function showResult() {
-    quizContainer.style.display = 'none';
-    resultDiv.textContent = `終了！あなたの正解数は ${score} / ${filteredQuestions.length} 問です。`;
+    function showQuestion() {
+      const q = filteredQuestions[currentQuestionIndex];
+      document.getElementById('question').textContent = `Q${currentQuestionIndex+1}: ${q.questionText}`;
 
-    if (missedQuestions.length > 0) {
-      let html = `<h2>間違えた問題一覧</h2>`;
-      missedQuestions.forEach(q => {
-        html += `<div class="missed-question">`;
-        html += `<p><strong>問題:</strong> ${q.questionText}</p>`;
-        html += `<p><strong>正解:</strong> ${q.correctAnswerIndex}</p>`;
-        html += `</div>`;
+      const options = [
+        q.option1, q.option2, q.option3, q.option4
+      ];
+      shuffleArray(options);
+
+      const optionsDiv = document.getElementById('options');
+      optionsDiv.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt === q.correctAnswerIndex);
+        optionsDiv.appendChild(btn);
       });
-      missedQuestionsDiv.innerHTML = html;
-    } else {
-      missedQuestionsDiv.innerHTML = `<p>すべて正解です！おめでとうございます！</p>`;
-    }
-  }
-
-  startBtn.addEventListener('click', () => {
-    const selectedSubject = subjectSelect.value;
-    const selectedUnit = unitSelect.value;
-
-    if (!selectedSubject || !selectedUnit) {
-      alert('科目と分野を両方選択してください。');
-      return;
     }
 
-    filteredQuestions = questions.filter(q => q.subject === selectedSubject && q.unit === selectedUnit);
-    if (filteredQuestions.length === 0) {
-      alert('該当する問題がありません。');
-      return;
+    function checkAnswer(button, isCorrect) {
+      const buttons = document.querySelectorAll('#options button');
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (isCorrect) {
+        button.style.backgroundColor = 'lightgreen';
+      } else {
+        button.style.backgroundColor = 'lightcoral';
+        wrongQuestions.push(filteredQuestions[currentQuestionIndex]);
+        localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+      }
+
+      if (currentQuestionIndex < filteredQuestions.length - 1) {
+        document.getElementById('nextQuestion').style.display = 'block';
+      } else {
+        alert('クイズ終了！');
+      }
     }
-    shuffle(filteredQuestions);
 
-    score = 0;
-    currentIndex = 0;
-    selectedAnswer = null;
-    missedQuestions = [];
-    resultDiv.textContent = '';
-    missedQuestionsDiv.textContent = '';
-    quizContainer.style.display = 'block';
-    showQuestion();
-    nextBtn.disabled = true;
-    nextBtn.textContent = '回答を確定する';
-  });
+    document.getElementById('nextQuestion').addEventListener('click', () => {
+      currentQuestionIndex++;
+      document.getElementById('nextQuestion').style.display = 'none';
+      showQuestion();
+    });
 
-  subjectSelect.addEventListener('change', () => {
-    updateUnitOptions(subjectSelect.value);
-    startBtn.disabled = true;
-    quizContainer.style.display = 'none';
-    resultDiv.textContent = '';
-    missedQuestionsDiv.textContent = '';
-  });
+    // 苦手問題表示
+    document.getElementById('showHistory').addEventListener('click', () => {
+      const historyDiv = document.getElementById('historyList');
+      const history = JSON.parse(localStorage.getItem('wrongQuestions') || '[]');
+      historyDiv.innerHTML = '<ul>' + history.map(q => `<li>${q.questionText} → 正解: ${q.correctAnswerIndex}</li>`).join('') + '</ul>';
+    });
 
-  unitSelect.addEventListener('change', () => {
-    startBtn.disabled = !unitSelect.value;
-  });
+    // 苦手問題解き直し
+    document.getElementById('retryWrong').addEventListener('click', () => {
+      const history = JSON.parse(localStorage.getItem('wrongQuestions') || '[]');
+      if (history.length === 0) {
+        alert('苦手問題はありません！');
+        return;
+      }
+      filteredQuestions = history;
+      shuffleArray(filteredQuestions);
+      currentQuestionIndex = 0;
+      document.getElementById('quiz').style.display = 'block';
+      showQuestion();
+    });
 
-  initSubjectOptions();
-
-</script>
-
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+  </script>
 </body>
 </html>
