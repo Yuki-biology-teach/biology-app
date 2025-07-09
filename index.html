@@ -2,49 +2,179 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>単語を極めよう！〜生物編〜</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="bioword.png" />
+  <link rel="apple-touch-icon" href="bioword.png" />
 </head>
 <body>
-  <h1>単語を極めよう！〜生物編〜</h1>
+  <header>
+    <h1>単語を極めよう！〜生物編〜</h1>
+  </header>
 
-  <div class="controls">
-    <label>科目:
-      <select id="subjectSelect"></select>
-    </label>
-    <label>単元:
-      <select id="unitSelect"></select>
-    </label>
-    <label>出題数:
-      <select id="modeSelect">
-        <option value="10">ランダム10問</option>
-        <option value="all">全問</option>
+  <main>
+    <!-- ホーム画面 -->
+    <section id="home">
+      <h2>学習範囲を選択</h2>
+      <div class="controls">
+        <label for="subject">科目：</label>
+        <select id="subject"></select>
+
+        <label for="unit">単元：</label>
+        <select id="unit"></select>
+
+        <label for="mode">モード：</label>
+        <select id="mode">
+          <option value="random">ランダム10問</option>
+          <option value="all">全問モード</option>
+          <option value="challenge">連続正解チャレンジ</option>
+          <option value="timeattack">タイムアタック</option>
+          <option value="favorites">お気に入りモード</option>
+          <option value="assistant">学習アシスタントモード</option>
+        </select>
+      </div>
+      <button id="startBtn">スタート</button>
+      <button id="reviewBtn">苦手問題一覧</button>
+      <button id="historyBtn">成績履歴を見る</button>
+
+      <!-- 進捗ダッシュボード -->
+      <section id="dashboard">
+        <h2>学習進捗</h2>
+        <div class="progress-cards">
+          <div class="card" id="totalSolved">総解答数: 0</div>
+          <div class="card" id="weeklySolved">今週の解答数: 0</div>
+          <div class="card" id="weakCount">苦手問題数: 0</div>
+          <div class="card" id="streakDays">連続学習日数: 0日</div>
+        </div>
+        <div class="goal-setting">
+          <label for="weeklyGoal">週の目標問題数:</label>
+          <input type="number" id="weeklyGoal" value="50" min="1" />
+          <button id="saveGoalBtn">設定を保存</button>
+        </div>
+        <div class="goal-progress">
+          <label>目標達成率:</label>
+          <progress id="goalProgress" value="0" max="100"></progress>
+          <span id="goalPercent">0%</span>
+        </div>
+      </section>
+
+      <!-- アプリの使い方 -->
+      <section id="guide">
+        <h2>アプリの使い方</h2>
+        <ul>
+          <li><strong>ランダム10問:</strong> 選んだ単元からランダムに10問を出題します。</li>
+          <li><strong>全問モード:</strong> 単元の全問題に挑戦します。</li>
+          <li><strong>連続正解チャレンジ:</strong> 何問連続正解できるか挑戦します。</li>
+          <li><strong>タイムアタック:</strong> 60秒間でできるだけ多く解答します。</li>
+          <li><strong>お気に入りモード:</strong> 自分が登録したお気に入り問題だけを解きます。</li>
+          <li><strong>学習アシスタントモード:</strong> 復習タイミングの問題を自動で出題します。</li>
+        </ul>
+        <button id="helpBtn">詳しい使い方を見る</button>
+      </section>
+    </section>
+
+    <!-- クイズ画面 -->
+    <section id="quiz" class="hidden">
+      <button id="backToHomeBtn">← ホームへ戻る</button>
+      <div id="meta">
+        <p id="currentSubject"></p>
+        <p id="currentUnit"></p>
+        <p id="progress"></p>
+        <p id="timer"></p>
+      </div>
+      <p id="question"></p>
+      <div id="choices"></div>
+      <p id="feedback"></p>
+      <button id="nextBtn" class="hidden">次の問題へ</button>
+    </section>
+
+    <!-- 苦手問題画面 -->
+    <section id="review" class="hidden">
+      <button id="backToHomeBtn2">← ホームへ戻る</button>
+      <h2>苦手問題一覧</h2>
+      <div id="reviewList"></div>
+      <button id="retryWrongBtn">苦手問題を再挑戦する</button>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="result" class="hidden">
+      <h2>結果</h2>
+      <p id="resultText"></p>
+      <button id="retryBtn">もう一度挑戦</button>
+      <button id="selectBtn">別の単元を選ぶ</button>
+    </section>
+
+    <!-- 成績履歴画面 -->
+    <section id="history" class="hidden">
+      <button id="backToHomeBtn3">← ホームへ戻る</button>
+      <h2>成績履歴</h2>
+      <label for="unitFilter">単元を選択：</label>
+      <select id="unitFilter">
+        <option value="">全ての単元</option>
       </select>
-    </label>
-    <button id="startBtn">スタート</button>
-    <button id="showStatsBtn">正答率を見る</button>
-    <button id="showMistakesBtn">苦手問題モード</button>
-  </div>
 
-  <div id="quizContainer" class="hidden">
-    <div id="question"></div>
-    <div id="options"></div>
-    <button id="nextBtn" class="hidden">次の問題へ</button>
-  </div>
+      <h3>最近の成績</h3>
+      <canvas id="recentChart"></canvas>
 
-  <div id="resultContainer" class="hidden">
-    <h2>結果</h2>
-    <div id="result"></div>
-    <div id="mistakeList"></div>
-    <button id="retryBtn" class="hidden">もう一度苦手問題に挑戦</button>
-  </div>
+      <h3>単元別平均正答率</h3>
+      <canvas id="unitChart"></canvas>
 
-  <div id="statsContainer" class="hidden">
-    <h2>単元別正答率</h2>
-    <div id="statsList"></div>
-  </div>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>科目</th>
+            <th>単元</th>
+            <th>正答数</th>
+            <th>問題数</th>
+            <th>正答率</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
 
+    <!-- 詳しい使い方画面 -->
+    <section id="help" class="hidden">
+      <button id="backToHomeBtn4">← ホームへ戻る</button>
+      <h2>詳しい使い方</h2>
+
+      <h3>ランダム10問</h3>
+      <p>指定した科目・単元の問題の中から、ランダムに10問を抽出して出題します。復習や確認に適したモードです。正答率は記録に残ります。</p>
+
+      <h3>全問モード</h3>
+      <p>選んだ単元に登録されているすべての問題に順番に挑戦できます。網羅的に理解を確認したいときにおすすめです。</p>
+
+      <h3>連続正解チャレンジ</h3>
+      <p>連続正解数を競うモードです。間違えた時点で終了し、記録が保存されます。集中力を高めたいときに活用してください。</p>
+
+      <h3>タイムアタック</h3>
+      <p>制限時間60秒で、できるだけ多くの問題を解答します。短時間での集中トレーニングに向いています。終了後、正解数と平均解答時間が表示されます。</p>
+
+      <h3>お気に入りモード</h3>
+      <p>お気に入りに登録した問題だけを出題します。苦手な問題や重要だと思った問題を重点的に復習できます。</p>
+
+      <h3>学習アシスタントモード</h3>
+      <p>間隔反復の理論に基づき、復習タイミングが来た問題を自動で出題します。正答率や解答履歴に応じて、次回の復習予定が調整されます。継続学習に最適です。</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="questions.js"></script>
   <script src="script.js"></script>
+
+  <script>
+    document.getElementById("helpBtn").addEventListener("click", () => {
+      document.querySelectorAll("main > section").forEach(sec => sec.classList.add("hidden"));
+      document.getElementById("help").classList.remove("hidden");
+    });
+
+    document.getElementById("backToHomeBtn4").addEventListener("click", () => {
+      document.querySelectorAll("main > section").forEach(sec => sec.classList.add("hidden"));
+      document.getElementById("home").classList.remove("hidden");
+    });
+  </script>
 </body>
 </html>
